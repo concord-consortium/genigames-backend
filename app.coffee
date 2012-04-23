@@ -20,6 +20,14 @@ app.use '/biologica', proxyToGeniverse
 # handle api urls here
 #
 
+app.get '/api/game', (req, res) ->
+  console.log "serving api/game"
+  res.json
+    version: 1
+    task: 
+      visibleGenes: ['T']
+
+
 # on a developer's local machine, also proxy the rake-pipeline preview server that builds the Ember 
 # app
 app.configure 'development', ->
