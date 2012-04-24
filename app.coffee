@@ -41,8 +41,12 @@ app.get '/api/game', (req, res, next) ->
     val = ""
 
     if couchResponse.statusCode isnt 200
-      next "There was a #{couchResponse.statusCode} error reading from the CouchDB server:\n\n#{util.inspect couchResponse.headers}"
-    
+      next """
+           There was a #{couchResponse.statusCode} error reading from the CouchDB server:
+
+           #{util.inspect couchResponse.headers}
+           """
+
     couchResponse.on 'data', (data) -> val += data
     couchResponse.on 'end', ->
       gameSpec = JSON.parse(val).gameSpec
