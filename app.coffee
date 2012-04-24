@@ -75,5 +75,7 @@ app.configure 'production', ->
 
 
 port = if process.env.NODE_PORT then parseInt(process.env.NODE_PORT, 10) else 3000
+
+console.log "about to listen on port #{port}"
 app.listen port
 
