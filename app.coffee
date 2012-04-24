@@ -4,7 +4,7 @@ util      = require 'util'
 express   = require 'express'
 
 geniverseProxy = new httpProxy.HttpProxy
-  target: 
+  target:
     host: 'geniverse.dev.concord.org'
     port: 80
   changeOrigin: true
@@ -32,7 +32,7 @@ app.use '/biologica', proxyToGeniverse
 #        * the gameSpec key is not found in the response
 
 app.get '/api/game', (req, res, next) ->
-  options = 
+  options =
     host: 'localhost'
     port: 5984
     path: '/genigames/game1'
@@ -48,12 +48,12 @@ app.get '/api/game', (req, res, next) ->
       gameSpec = JSON.parse(val).gameSpec
       if !gameSpec then next "gameSpec was empty!"
       res.json gameSpec
-  
-  couch.on 'error', (err) -> 
+
+  couch.on 'error', (err) ->
     next "There was an error connecting to the CouchDB server:\n\n#{util.inspect err}"
 
 
-# on a developer's local machine, also proxy the rake-pipeline preview server that builds the Ember 
+# on a developer's local machine, also proxy the rake-pipeline preview server that builds the Ember
 # app
 app.configure 'development', ->
    console.log "Development env setup"
@@ -62,7 +62,7 @@ app.configure 'development', ->
 # deployed to a server (and here, genigames.dev.concord.org counts as a "production" NODE_ENV)
 # serve static assets from the build folder
 app.configure 'production', ->
-  console.log "Production env setup"  
+  console.log "Production env setup"
   app.use express.static "#{__dirname}/public/static"
 
 app.listen 3000
