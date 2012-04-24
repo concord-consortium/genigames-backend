@@ -18,6 +18,10 @@ app = express.createServer()
 app.use '/resources', proxyToGeniverse
 app.use '/biologica', proxyToGeniverse
 
+# also proxy CouchDB
+
+app.use '/couchdb', httpProxy.createServer 'localhost', 5984
+
 #
 # handle api urls here
 #
