@@ -73,4 +73,7 @@ app.configure 'production', ->
   console.log "Production env setup"
   app.use express.static "#{__dirname}/public/static"
 
-app.listen 3000
+
+port = if process.env.NODE_PORT then parseInt(process.env.NODE_PORT, 10) else 3000
+app.listen port
+
