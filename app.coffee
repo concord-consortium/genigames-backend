@@ -2,25 +2,15 @@ httpProxy = require 'http-proxy'
 http      = require 'http'
 util      = require 'util'
 express   = require 'express'
+io        = require 'socket.io'
 
-geniverseProxy = new httpProxy.HttpProxy
-  target:
-    host: 'geniverse.dev.concord.org'
-    port: 80
-  changeOrigin: true
-
-proxyToGeniverse = (req, res, next) ->
-  req.url = req.originalUrl
-  geniverseProxy.proxyRequest req, res
-
+port = if process.env.NODE_PORT then parseInt(process.env.NODE_PORT, 10) else 3000
+console.log "about to listen on port #{port}"
 app = express.createServer()
+server = app.listen port
 
-app.use '/resources', proxyToGeniverse
-app.use '/biologica', proxyToGeniverse
-
-# also proxy CouchDB
-
-app.use '/couchdb', httpProxy.createServer 'localhost', 5984
+# see https://github.com/LearnBoost/socket.io/issues/843
+io = io.listen server
 
 #
 # handle api urls here
@@ -59,6 +49,37 @@ app.get '/api/game', (req, res, next) ->
   couch.on 'error', (err) ->
     next "There was an error connecting to the CouchDB server:\n\n#{util.inspect err}"
 
+#
+# handle client-side logging here
+#
+
+io.sockets.on 'connection', (socket) ->
+  socket.emit 'news', hello: 'world'
+  socket.on 'my other event', (data) ->
+    console.log(data)
+
+# to post log item to couchdb note the following:
+# curl -vX POST http://localhost:5984/genigames-logs/ -H "Content-Type: application/json" -d "{ \"newdata\": 2 }
+
+#
+# proxies here
+#
+
+geniverseProxy = new httpProxy.HttpProxy
+  target:
+    host: 'geniverse.dev.concord.org'
+    port: 80
+  changeOrigin: true
+
+proxyToGeniverse = (req, res, next) ->
+  # do this to avoid stripping the leading part of the url
+  req.url = req.originalUrl
+  geniverseProxy.proxyRequest req, res
+
+# proxied urls
+app.use '/resources', proxyToGeniverse
+app.use '/biologica', proxyToGeniverse
+app.use '/couchdb', httpProxy.createServer 'localhost', 5984
 
 # on a developer's local machine, also proxy the rake-pipeline preview server that builds the Ember
 # app
@@ -71,9 +92,3 @@ app.configure 'development', ->
 app.configure 'production', ->
   console.log "Production env starting"
   app.use express.static "#{__dirname}/public/static"
-
-
-port = if process.env.NODE_PORT then parseInt(process.env.NODE_PORT, 10) else 3000
-
-console.log "about to listen on port #{port}"
-app.listen port
