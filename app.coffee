@@ -58,6 +58,9 @@ io.sockets.on 'connection', (socket) ->
   socket.on 'my other event', (data) ->
     console.log(data)
 
+  socket.on 'log', (logData) ->
+    console.log "log from client: \n#{util.inspect logData}\n"
+
 # to post log item to couchdb note the following:
 # curl -vX POST http://localhost:5984/genigames-logs/ -H "Content-Type: application/json" -d "{ \"newdata\": 2 }
 
