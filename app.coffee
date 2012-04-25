@@ -63,13 +63,13 @@ app.get '/api/game', (req, res, next) ->
 # on a developer's local machine, also proxy the rake-pipeline preview server that builds the Ember
 # app
 app.configure 'development', ->
-   console.log "Development env setup"
+   console.log "Development env starting"
    app.use new httpProxy.createServer 'localhost', 9292
 
 # deployed to a server (and here, genigames.dev.concord.org counts as a "production" NODE_ENV)
 # serve static assets from the build folder
 app.configure 'production', ->
-  console.log "Production env setup"
+  console.log "Production env starting"
   app.use express.static "#{__dirname}/public/static"
 
 
@@ -77,4 +77,3 @@ port = if process.env.NODE_PORT then parseInt(process.env.NODE_PORT, 10) else 30
 
 console.log "about to listen on port #{port}"
 app.listen port
-
