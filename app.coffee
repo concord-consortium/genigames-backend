@@ -29,7 +29,7 @@ app.get '/api/game', (req, res, next) ->
   options =
     host: 'localhost'
     port: 5984
-    path: '/genigames/game1'
+    path: '/genigames/_design/show/_view/all'
 
   couch = http.get options, (couchResponse) ->
     val = ""
@@ -43,8 +43,7 @@ app.get '/api/game', (req, res, next) ->
 
     couchResponse.on 'data', (data) -> val += data
     couchResponse.on 'end', ->
-      gameSpec = JSON.parse(val).gameSpec
-      if gameSpec then res.json gameSpec else next "gameSpec was empty!\n\n#{val}"
+      res.json JSON.parse(val)
 
   couch.on 'error', (err) ->
     next "There was an error connecting to the CouchDB server:\n\n#{util.inspect err}"
