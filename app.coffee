@@ -67,6 +67,16 @@ io.sockets.on 'connection', (socket) ->
 # proxies here
 #
 
+localhostProxy = new httpProxy.HttpProxy
+  target:
+    host: 'localhost'
+    port: 8080
+  changeOrigin: true
+
+proxyToLocalApache = (req, res, next) ->
+  req.url = req.originalUrl
+  localhostProxy.proxyRequest req, res
+
 geniverseProxy = new httpProxy.HttpProxy
   target:
     host: 'geniverse.dev.concord.org'
@@ -82,6 +92,7 @@ proxyToGeniverse = (req, res, next) ->
 app.use '/resources', proxyToGeniverse
 app.use '/biologica', proxyToGeniverse
 app.use '/couchdb', httpProxy.createServer 'localhost', 5984
+app.use '/portal', proxyToLocalApache
 
 # on a developer's local machine, also proxy the rake-pipeline preview server that builds the Ember
 # app
